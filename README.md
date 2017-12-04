@@ -4,7 +4,6 @@
 一个实时地干离线的活的流式计算平台！<br />
 基于[hive sql](https://cwiki.apache.org/confluence/display/Hive/LanguageManual)，能进行各种复杂业务的sql运算。<br />
 UV，PV，新UV，跟踪类指标，在线时长、在线人数等，都可以算。并且可以是0误差。<br /><br />
-本平台已用每天几十亿行的数据验证通过。<br />
 
 
 #### 一、特点：
