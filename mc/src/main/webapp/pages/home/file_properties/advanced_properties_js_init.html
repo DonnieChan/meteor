@@ -1,0 +1,7 @@
+<%/* 
+ * 切换：显示/隐藏
+ */%>
+$("form button#advanced_properties_btn").toggle(
+	function(){ $("form div#advanced_properties_body").show(); onLoadWindowSelf(); },
+	function(){ $("form div#advanced_properties_body").hide(); onLoadWindowSelf(); }
+);

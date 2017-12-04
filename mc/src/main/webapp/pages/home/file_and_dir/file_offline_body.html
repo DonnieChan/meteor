@@ -1,0 +1,35 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * 下线任务
+ * projectId 初始化传入
+ * 
+ * author: taosheng
+ */%>
+	
+	<form name="projectOfflineFileDataForm" method="post" id="projectOfflineFileDataForm" target="_parent" action="${ctx}/task/offline.do" onsubmit=""> 
+		<input id="fileId" name="fileId" type="hidden" value="${defFileSys.fileId}" />
+		
+		<div class="control-group">
+			<label class="control-label">
+				<button id="projectOfflineFileBtn" name="projectOfflineFileBtn" type="button" class="btn btn-primary" onclick="$('#offlineConfirmModalLink').click();" >任务下线</button>
+			</label>
+		</div>
+		
+		<a href="#offlineConfirmModalDiv" id="offlineConfirmModalLink" style="display:none;" role="button" class="btn" data-toggle="modal">查看演示案例</a>
+ 
+		<!-- Modal -->
+		<div id="offlineConfirmModalDiv" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="position:absolute;left:50%;top:500px;">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				<h3 id="myModalLabel">提示：</h3>
+			</div>
+			<div class="modal-body">
+				<p>确定要执行该操作？</p>
+			</div>
+			<div class="modal-footer">
+				<button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+				<button class="btn btn-primary">确认</button>
+			</div>
+		</div>
+		
+	</form> 

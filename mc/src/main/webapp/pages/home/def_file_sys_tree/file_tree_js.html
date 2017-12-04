@@ -1,0 +1,264 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * defFileSysTree
+ * 普通常用的js，为该tree而特有的
+ *
+ * 重要！！
+ * onClick: defFileSysTreeOnClick  需要在嵌入页面实现该js(相当于实现接口中的方法)，与具体业务相关，不同于 onExpand 
+ * 
+ * author: taosheng
+ */%>
+
+
+var defFileSysTreeSetting = {
+		check: {
+			autoCheckTrigger:true,
+			enable: false
+		},
+		view: {
+			showTitle: true,
+			showIcon: false,
+			nameIsHTML: true,
+			fontCss: setFontCss
+		},
+		async: {
+			enable: true,
+			url: "${ctx}/schedule/nPId/getDefFileSysTree.do",
+			autoParam: ["uniqueName","parentUniqueName","name"]
+		},
+		data: {
+			key: {
+				name: "name",
+				title: "caption" 
+			},
+			simpleData: {
+				enable: true,
+				idKey: "uniqueName",
+				pIdKey: "parentUniqueName"
+			}
+		},
+		callback: {
+			onClick: zFileTreeOnClick,
+			onExpand: zFileTreeOnExpand
+		}
+	};
+
+
+/** zFileTreeOnExpand */
+function zFileTreeOnClick(event, treeId, treeNode) {
+	// 展开当前节点的孩子节点
+	var expandFlag = treeNode.open==true ? false : true;
+	expandChildrenNode(treeId, treeNode, expandFlag);
+	
+	defFileSysTreeOnClick(event, treeId, treeNode);
+}
+
+
+/** zFileTreeOnExpand */
+function zFileTreeOnExpand(event, treeId, treeNode) {
+	// alert('onExpand'); 
+	onLoadWindowSelf();
+	return true;
+}
+
+
+/** 展开 或 折叠 */
+function expandDefFileSysTreeNode(e) {
+	var treeId = e.data.treeId;
+	var treeObj = $.fn.zTree.getZTreeObj(treeId);
+	var actionType = e.data.actionType;
+	
+	if (actionType == "expandAll") {
+		expandAllNodes(treeId, true);
+	} else if (actionType == "expandSelected") {
+		expandSelectedNodes(treeId, true);
+	} else if (actionType == "collapseAll") {
+		treeObj.expandAll(false);
+	} else if (actionType == "collapseSelected") {
+		expandSelectedNodes(treeId, false);
+	}
+	
+	// 回设本页面高度
+	onLoadWindowSelf();
+}
+
+
+/** zFileTreeOnAsyncSuccess */
+function zFileTreeOnAsyncSuccess(event, treeId, treeNode, msg) {
+	selectInitTreeNodeById(treeId, '${projectId}', '${fileId}');
+};
+
+
+/** one project to initialize schedule index page */
+function selectOneInitialProject(treeId){
+	var treeObj = $.fn.zTree.getZTreeObj(treeId);
+	var nodes = treeObj.getNodes();
+	
+	var node = null;
+	for(var i=0; i < nodes.length; i++){
+		node = nodes[i];
+		if( node.ext['isProject']=='1' && node.ext['isValid']=='1' ){
+			return node.ext['idValue'];
+		}
+	}
+	
+	return null;
+}
+
+
+/** ztree selectNode */
+function selectInitTreeNodeById(treeId, projectId, fileId){
+	if(isOrUndefinedNullEmpty(projectId)){
+		projectId = selectOneInitialProject(treeId);
+		if(isOrUndefinedNull(projectId)){
+			alert('无任何有权限的项目，请申请！');
+			return;
+		}
+	}
+	
+	// expand project dir file 
+	var node = expandScheduleTreeNodeItem(treeId, projectId, fileId);
+	
+	// goto scheduleFrame url
+	goToScheduleFrameUrl(node);
+}
+
+
+/** expand project dir file */
+function expandScheduleTreeNodeItem(treeId, projectId, fileId){
+	var treeObj = $.fn.zTree.getZTreeObj(treeId);
+	var nodes = treeObj.getNodes();
+	var node = null;
+	
+	// expand project
+	for(var i=0; i < nodes.length; i++){
+		node = nodes[i];
+		if( isEqualToProject(node, projectId) ){
+			treeObj.selectNode(node);
+			treeObj.expandNode(node, true, false, false, true); 
+			break;
+		}
+	}
+	
+	// expand dir file
+	if(!isOrUndefinedNullEmpty(fileId) && fileId!='0'){
+		nodes = treeObj.transformToArray(new Array(node));
+		for(var i=0; i < nodes.length; i++){
+			node = nodes[i];
+			if( isEqualToDirOrFile(node, fileId) ){
+				treeObj.selectNode(node);
+				treeObj.expandNode(node, true, false, false, true);
+				break;
+			}
+		}
+	}
+	
+	return node;
+}
+
+
+/** goto scheduleFrame url */
+function goToScheduleFrameUrl(treeNode){
+	var src = generateScheduleFrameUrl(treeNode);
+	
+	$("iframe#${iFrameId}").attr("src", src);
+}
+
+
+/** make scheduleFrame url */
+function generateScheduleFrameUrl(treeNode){
+	var src = "${ctx}/schedule/index.do";
+	if(isOrUndefinedNull(treeNode)){
+		return src;
+	}
+	var idValue = treeNode.ext['idValue'];
+	if(isOrUndefinedNull(idValue)){
+		return src;
+	}
+	
+	if(treeNode.ext['isProject']=='1'){
+		src = "${ctx}/schedule/project.do?projectId=" + treeNode.ext['projectId'];
+	}else if(treeNode.ext['isDir']=='1'){
+		src = "${ctx}/schedule/dir.do?projectId="  + treeNode.ext['projectId'] + "&fileId=" + treeNode.ext['fileId'];
+	}else{
+		src = "${ctx}/schedule/file.do?projectId=" + treeNode.ext['projectId'] + "&fileId=" + treeNode.ext['fileId'];
+	}
+	
+	return src;
+}
+
+
+
+/** isEqualToProject */
+function isEqualToProject(treeNode, projectId){
+	if(isOrUndefinedNull(treeNode) || isOrUndefinedNull(projectId)){
+		return false;
+	}
+	
+	return treeNode.ext['idType']=='defProject' && treeNode.ext['idValue']==projectId ;
+}
+
+
+/** isEqualToDir */
+function isEqualToDirOrFile(treeNode, fileId){
+	if(isOrUndefinedNull(treeNode) || isOrUndefinedNull(fileId)){
+		return false;
+	}
+	
+	return treeNode.ext['idType']=='defFileSys' && treeNode.ext['idValue']==fileId ;
+}
+
+
+/** ztree selectNode */
+function selectInitProjectNodeById(treeId, idValue){
+	var treeObj = $.fn.zTree.getZTreeObj(treeId);
+	var nodes = treeObj.getNodes();
+	var node;
+	for(var i=0; i<nodes.length; i++){
+		node = nodes[i];
+		if( node.ext['idValue']==idValue ){
+			treeObj.selectNode(node);
+			treeObj.expandNode(node, true, false, false, true);
+			break;
+		}
+	}
+	
+	// var data = { type:dataType, value:dataValue };
+	// var nodes = treeObj.getNodesByFilter(searchTreeFilterByDataTypeId, true, null, data); // 查找节点集合
+	// var nodes = treeObj.getNodesByFilter(searchTreeFilterById, true, null, dataValue); // 查找节点集合
+	// treeObj.showNodes(nodes);
+}
+
+
+/** 设置底色 */
+function setFontCss(treeId, treeNode) {
+	if(treeNode.ext['isProject']=='1'){
+		return { color:"Green" };
+	}else if(treeNode.ext['isDir']=='1'){
+		return { color:"Red" };
+	}else if(treeNode.ext['isValid']=='0'){
+		return { color:"Grey" };
+	}else{
+		return { color:"Blue" };
+	}
+}
+
+
+/** ztree Fileter */
+function searchTreeFilterByDataTypeId(node, data){
+	if(node.ext && node.ext['idType']==data.type && node.ext['idValue']==data.value){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+/** ztree Fileter */
+function searchTreeFilterById(node, data){
+	if(node.ext && node.ext['idValue']==data){
+		return true;
+	}else{
+		return false;
+	}
+}
+

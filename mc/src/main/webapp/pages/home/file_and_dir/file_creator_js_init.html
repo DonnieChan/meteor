@@ -1,0 +1,18 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * 创建任务
+ * js-初始化-方法体
+ * 
+ * 此次button/div的id，参照 ./file_creator_body.html 
+ * 
+ * author: taosheng
+ */%>
+
+<%/* 
+ * 切换：显示/隐藏
+ */%>
+$("button#projectCreateFileBtn").toggle(
+	function(){ $("div#projectCreateFileDiv").show(); onLoadWindowSelf(); },
+	function(){ $("div#projectCreateFileDiv").hide(); onLoadWindowSelf(); }
+);
+

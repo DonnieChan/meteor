@@ -1,0 +1,23 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * 删除目录
+ * projectId 初始化传入
+ * 
+ * author: taosheng
+ */%>
+
+	<form name="projectDeleteDirDataForm" method="post" id="projectDeleteDirDataForm" target="_parent" action="${ctx}/task/delete.do" onsubmit=""> 
+	
+		<input id="fileId" name="fileId" type="hidden" value="${defFileSys.fileId}" />
+		
+		<div class="control-group">
+			<label class="control-label">
+				<button id="projectDeleteDirBtn" name="projectDeleteDirBtn" type="button" class="btn btn-primary" onclick="$('#deleteConfirmModalLink').click();" >删除目录</button>
+			</label>
+		</div>
+		
+		<!-- 确定删除 id="deleteConfirmModalLink" -->
+		<%@include file="../../../commons/delete_confirm_modal_body.html"%>
+		
+	</form> 
+

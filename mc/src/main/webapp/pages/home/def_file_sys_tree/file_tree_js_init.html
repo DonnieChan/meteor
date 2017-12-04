@@ -1,0 +1,22 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * defFileSysTree
+ * 初始化的js，需放在 body script $(function () { 放在这里 }); 
+ * 
+ * author: taosheng
+ */%>
+
+<%/* 
+ * 
+ * 开启 onAsyncSuccess : selectNodeByDataTypeId 选中指定的节点
+ */%>
+
+defFileSysTreeSetting.callback.onAsyncSuccess = zFileTreeOnAsyncSuccess;
+
+$.fn.zTree.init($("#defFileSysTree"), defFileSysTreeSetting, null);
+
+$("#expandAllBtn").bind("click", {treeId:"defFileSysTree", actionType:"expandAll"}, expandDefFileSysTreeNode);
+$("#expandSelectedBtn").bind("click", {treeId:"defFileSysTree", actionType:"expandSelected"}, expandDefFileSysTreeNode);
+$("#collapseAllBtn").bind("click", {treeId:"defFileSysTree", actionType:"collapseAll"}, expandDefFileSysTreeNode);
+$("#collapseSelectedBtn").bind("click", {treeId:"defFileSysTree", actionType:"collapseSelected"}, expandDefFileSysTreeNode);
+

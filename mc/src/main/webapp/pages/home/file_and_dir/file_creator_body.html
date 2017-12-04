@@ -1,0 +1,22 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * 创建子目录
+ * projectId 初始化传入
+ * 
+ * author: taosheng
+ */%>
+
+	<form name="projectCreateFileDataForm" method="post" id="projectCreateFileDataForm"  action="" onsubmit=""> 
+		<div class="control-group">
+			<label class="control-label">
+				<button id="projectCreateFileBtn" name="projectCreateFileBtn" type="button" class="btn btn-primary" >创建任务</button>
+			</label>
+		</div>
+	</form> 
+
+
+<%/* 
+ * 创建任务
+ * include file="../file_creator/index.html"
+ */%>
+<%@include file="../file_creator/index.html"%>

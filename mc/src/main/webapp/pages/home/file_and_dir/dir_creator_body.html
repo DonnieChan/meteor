@@ -1,0 +1,28 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * 创建子目录
+ * projectId 初始化传入
+ * 
+ * author: taosheng
+ */%>
+
+	<form name="projectCreateDirDataForm" method="post" id="projectCreateDirDataForm" target="_parent" action="${ctx}/dir/createDir.do" onsubmit=""> 
+		
+		<input id="projectId" name="projectId" type="hidden" value="${projectId}" />
+		
+		<!-- 处理时 被认为是 parentFileId -->
+		<input id="fileId" name="fileId" type="hidden" value="${fileId}" />
+		
+		<div class="control-group">
+			<label class="control-label">目录名称</label>
+			<div class="controls">
+				<input id="projectCreateDirIptName" name="projectCreateDirIptName" type="text" value="" placeholder="请输入子目录名称..." required ></input> 
+			</div>
+		</div>
+		
+		<div class="control-group">
+			<label class="control-label">
+				<button id="projectCreateDirBtn" name="projectCreateDirBtn" type="submit" class="btn btn-primary" >创建子目录</button>
+			</label>
+		</div>
+	</form> 

@@ -1,0 +1,121 @@
+rm -fr /data4/spark/checkpoint
+/data/apps/spark/bin/spark-submit \
+  --class com.duowan.meteor.server.MeterorServer \
+  --master spark://master:7077 \
+  --executor-memory 40G \
+  --total-executor-cores 4320 \
+  --driver-cores 20 \
+  --driver-memory 40G \
+  --supervise \
+  --verbose \
+  /data/apps/meteor/meteor-server-1.0-SNAPSHOT-jar-with-dependencies.jar \
+  "MeteorServer" "60" "/data4/spark/checkpoint" false cassandra1 \
+  > /data/apps/spark/work/meteor_server.log 2>&1 &
+  
+
+rm -fr /data4/spark/checkpoint
+/data/apps/spark/bin/spark-submit \
+  --class com.duowan.meteor.server.MeterorServer \
+  --master spark://master:7077 \
+  --executor-memory 40G \
+  --total-executor-cores 4320 \
+  --driver-cores 20 \
+  --driver-memory 40G \
+  --supervise \
+  --verbose \
+  --driver-java-options -agentlib:jdwp=transport=dt_socket,address=5005,server=y,suspend=y \
+  /data/apps/meteor/meteor-server-1.0-SNAPSHOT-jar-with-dependencies.jar \
+  "MeteorServer" "60" "/data4/spark/checkpoint" false cassandra1
+
+
+/home/spark/spark/bin/spark-submit \
+  --class com.duowan.mydemo.spark.UDFTest \
+  --master spark://master:7077 \
+  --executor-memory 10G \
+  --total-executor-cores 100 \
+  --driver-cores 20 \
+  --driver-memory 10G \
+  --supervise \
+  --verbose \
+  --driver-java-options -agentlib:jdwp=transport=dt_socket,address=5005,server=y,suspend=y \
+  /home/spark/data_chenwu/mydemo-assembly-1.0.jar
+
+ps -ef | grep -v grep | egrep "ActionData" | awk '{print $2}' | xargs kill -9
+java -Xms5120m -Xmx5120m -cp /data/apps/meteor/meteor-queueswap-1.0-SNAPSHOT-jar-with-dependencies.jar com.duowan.queueswap.ActionData 50 10 > /data/spark/tmp/queueswap/run.log 2>&1 &
+
+ps -ef | grep -v grep | egrep "PayData" | awk '{print $2}' | xargs kill -9
+java -Xms512m -Xmx512m -cp /data/apps/meteor/meteor-queueswap-1.0-SNAPSHOT-jar-with-dependencies.jar com.duowan.queueswap.PayData > /data/spark/tmp/queueswap/run.log 2>&1 &
+
+ps -ef | grep -v grep | egrep "HuyaData" | awk '{print $2}' | xargs kill -9
+java -Xms5120m -Xmx5120m -cp /data/apps/meteor/meteor-queueswap-1.0-SNAPSHOT-jar-with-dependencies.jar com.duowan.queueswap.HuyaData 2 > /data/spark/tmp/queueswap/run.log 2>&1 &
+java -Xms5120m -Xmx5120m -cp /data/apps/meteor/meteor-queueswap-1.0-SNAPSHOT-jar-with-dependencies.jar com.duowan.queueswap.HuyaData 3 > /data/spark/tmp/queueswap/run.log 2>&1 &
+
+tail -fn 200 /data/spark/tmp/queueswap/queueswap.log
+  
+  
+/data/apps/kafka/bin/zookeeper-shell.sh cassandra1:2181
+
+
+ps -ef | grep -v grep | egrep "CassandraDaemon" | awk '{print $2}' | xargs kill -9
+/data/apps/cassandra/bin/cassandra
+/data/apps/cassandra/bin/nodetool status
+/data/apps/cassandra/bin/cqlsh cassandra1 9042
+/data/apps/cassandra/bin/nodetool repair
+/data/apps/cassandra/bin/nodetool compact
+/data/apps/cassandra/bin/nodetool compactionstats 
+ 
+  
+
+/data/apps/kafka/bin/zookeeper-server-start.sh /data/apps/kafka/config/zookeeper.properties > /data/apps/kafka/logs/startup_zookeeper.log 2>&1 &
+/data/apps/kafka/bin/kafka-server-start.sh /data/apps/kafka/config/server.properties > /data/apps/kafka/logs/startup_kafka.log 2>&1 &
+
+
+/data/apps/kafka/bin/kafka-topics.sh --list --zookeeper 10.21.33.117:2181
+
+/data/apps/kafka/bin/kafka-topics.sh --describe --zookeeper 10.21.33.117:2181 --topic source_ods_pay_consume
+
+/data/apps/kafka/bin/kafka-console-consumer.sh --zookeeper 10.21.33.117:2181 --from-beginning --topic gas
+/data/apps/kafka/bin/kafka-console-consumer.sh --zookeeper 10.21.33.117:2181 --topic gas
+
+/data/apps/kafka/bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper 10.21.33.117:2181 --group meteor --topic source_ods_action_log
+/data/apps/kafka/bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper 10.21.33.117:2181 --group meteor --topic source_ods_pay_consume
+/home/kafka/kafka/bin/kafka-run-class.sh kafka.tools.ConsumerOffsetChecker --zookeeper 10.21.41.231:2181 --group meteor --topic huya_action_log
+
+/data/apps/kafka/bin/kafka-topics.sh --create --zookeeper 10.21.33.117:2181 --replication-factor 2 --partitions 10 --topic source_ods_action_log
+
+/data/apps/kafka/bin/kafka-topics.sh --zookeeper 10.21.33.117:2181 --delete --topic source_ods_action_log
+
+
+
+master -> 
+ss|grep 20151222
+curl "http://master:9090/qswitch/set"
+java -Xms1024m -Xmx1024m -cp /data/apps/meteor/queueswap-0.0.1-SNAPSHOT-jar-with-dependencies.jar com.duowan.meteor.server.QueueSwapServer
+
+cassandra1 ->
+java -Xms2048m -Xmx2048m -cp /data/apps/meteor/userinfo-server-0.0.1-SNAPSHOT-jar-with-dependencies.jar com.duowan.meteor.server.UserInfoServer 9090 > /data/spark/tmp/userinfo_server.log 2>&1 &
+
+cassandra3 ->
+java -Xms1024m -Xmx1024m -cp /data/apps/meteor/meteor-tool-0.0.1-SNAPSHOT-jar-with-dependencies.jar com.duowan.meteor.KafkaConsumer gas > /data/spark/tmpgas_consumer.log 2>&1 &
+
+
+hive -> cassandra初始化导入
+java -Xms5012m -Xmx5012m -cp /data/apps/meteor/meteor-datasync-1.0-SNAPSHOT-jar-with-dependencies.jar com.duowan.datasync.ITaskExecutor 431 Hive2Cassandra 20150505 --et 2016-03-09 > /data/spark/tmp/h2c.log 2>&1 &
+java -Xms1024m -Xmx1024m -cp /data/apps/meteor/meteor-datasync-1.0-SNAPSHOT-jar-with-dependencies.jar com.duowan.datasync.ITaskExecutor 431 Mysql2Cassandra 20160406
+
+
+
+/urlproxy/tourl.do?url=http%3a%2f%2frtview.meteor.game.yy.com%2fhuyaOref.do
+/urlproxy/tourl.do?url=http%3a%2f%2frtview.meteor.game.yy.com%2fgameIreftc.do
+
+/urlproxy/tourl.do?url=http%3a%2f%2f116.31.121.49%3a8888%2fhuyaOref.do
+/urlproxy/tourl.do?url=http%3a%2f%2f116.31.121.49%3a8888%2fgameIreftc.do
+/urlproxy/tourl.do?url=http%3a%2f%2f116.31.121.49%3a8888%2fhuyaBCOnlineUsers.do
+
+https://rtview-meteor.yy.com/huyaOref.do
+https://rtview-meteor.yy.com/gameIreftc.do
+https://rtview-meteor.yy.com/huyaBCOnlineUsers.do
+https://rtview-meteor.yy.com/InnerRefAmount.do
+
+
+curl http://cassandra1:9090/rpc/UserInfoWebService/passportToYYUid?passport=dw_chenwu

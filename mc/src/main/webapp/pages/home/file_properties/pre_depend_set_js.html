@@ -1,0 +1,262 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * 前置依赖 of 创建任务
+ * js-方法体
+ * 
+ * 此次button/div的id，参照 ./pre_depend_set_choose.html 
+ * 
+ * author: taosheng
+ */%>
+
+
+<%/* 
+ * 展示被选中的数据
+ * 必须是 同步获取信息，即：async: false，时间上的先后顺序
+ */%>
+function getNameToReSetIFrameSizeOnParentPage(){
+	return "beCalledToReSetIFrameSizeOnParentPage";
+}
+
+<%/* 
+ * 展示被选中的数据
+ * 必须是 同步获取信息，即：async: false，时间上的先后顺序
+ */%>
+function displaySelectedTreeNode(event, treeId, treeNode){  
+	var idType = treeNode.ext['idType'];
+	var idValue = treeNode.ext['idValue'];
+	
+	var divId = "div#preDependProjectTreeTopDiv";
+	var btnChooseId = "button#pre_depend_set_task_choose_btn";
+	var textareaId = "textarea#pre_depend_set_task_choose_info";
+	
+	$(divId).show();
+	$(btnChooseId).attr("disabled", true);
+	
+	if(idType=='defFileSys' && idValue!='${fileId}'){
+		$(btnChooseId).unbind("click");
+		$(btnChooseId).bind("click", {treeNode:treeNode, tableId:getPreDependTableId()}, chooseSelectedTreeNodeAsPreDepend);
+		$(btnChooseId).attr("disabled", false);
+	}
+}
+
+<%/* 
+ * 选择：在项目树中选择前缀依赖 
+ * 被选中的数据 As PreDepend 
+ */%>
+function chooseSelectedTreeNodeAsPreDepend(e){ 
+	var treeNode = e.data.treeNode;
+	var tableId = e.data.tableId;
+	var fileId = treeNode.ext['idValue'];
+	
+	fileDataIntoTableAsPreDepend(false, fileId, tableId);
+}
+
+<%/* 
+ * 输入：自定义输入前缀依赖的任务ID 
+ */%>
+function chooseCustomInputAsPreDepend(text){ 
+	var idPrefix = 'textarea#preDependCustomInputTextArea';
+	clearCustomInputContent(false);
+	
+	if(isOrUndefinedNullEmpty(text)){
+		alert("任务ID列表 不能为空！");
+	}
+	text = text.trim();
+	if(isEmpty(text)){
+		alert("任务ID列表 不能为空！");
+	}
+	
+	var fileIdArray = text.split(/;|,/);
+	var ignoreAlert = true;
+	var fileId;
+	var tableId = getPreDependTableId();
+	var allNum = fileIdArray.length;
+	var ignoreNum = 0, retVal;
+	for(var i=0; i<allNum; i++){
+		fileId = fileIdArray[i].trim();
+		if(isEmpty(fileId)){
+			ignoreNum = ignoreNum + 1; 
+			continue;
+		}
+		retVal = fileDataIntoTableAsPreDepend(ignoreAlert, fileId, tableId);
+		displayResultOfPreDepend(fileId, retVal, idPrefix);
+	}
+	
+	var message = "处理的前缀依赖总数量："+allNum+" "; 
+	// alert();  , 成功添加："+(allNum-ignoreNum)+", 忽略"+ignoreNum+"个(或已存在或无效任务ID)。
+	$('#preDependCustomInputResultMessage').html(message);
+	// $('#preDependCustomInputResultMessage').css('color', 'black');
+	// setTimeout(new function(){$('#preDependCustomInputResultMessage').html(message);}, 500);
+}
+
+<%/* 
+ * 输出操作信息
+ *  0 : 成功添加
+ * -1 : 已经存在
+ * -2 : 错误无效
+ */%>
+function clearCustomInputContent(idPrefix, isClearCustom){
+	var idPrefix = 'textarea#preDependCustomInputTextArea';
+	$('#preDependCustomInputResultMessage').html('');
+	$(idPrefix+'Inserted').attr('value', '');
+	$(idPrefix+'Existed').attr('value', '');
+	$(idPrefix+'Errored').attr('value', '');
+	
+	if(isClearCustom){
+		$(idPrefix).attr('value', '');
+	}
+}
+
+<%/* 
+ * 输出操作信息
+ *  0 : 成功添加
+ * -1 : 已经存在
+ * -2 : 错误无效
+ */%>
+function displayResultOfPreDepend(fileId, retVal, idPrefix){
+	var id, idSuffix;
+	if(retVal==0){
+		idSuffix = "Inserted";
+	}else if(retVal==-1){
+		idSuffix = "Existed";
+	}else{
+		idSuffix = "Errored";
+	}
+	
+	id = idPrefix+idSuffix;
+	var oldValue = $(id).attr('value').trim(), newValue;
+	if(isEmpty(oldValue)){
+		newValue = fileId;
+	}else{
+		newValue = oldValue + "; " + fileId;
+	}
+	$(id).attr('value', newValue);
+}
+
+<%/* 
+ * fileDataIntoTableAsPreDepend 
+ *  0 : 成功添加
+ * -1 : 已经存在
+ * -2 : 错误无效
+ */%>
+function fileDataIntoTableAsPreDepend(ignoreAlert, fileId, tableId){ 
+	if(isOrUndefinedNullEmpty(fileId)){
+		alert("任务ID = " + fileId + ", 不能为空！");
+	}
+
+	if(fileId=='${fileId}'){
+		if(!ignoreAlert){
+			alert("任务ID = " + fileId + ", 无效，前缀依赖不能为自身！");
+		}
+		return -2;
+	}
+	
+	if(isOrUndefinedNullEmpty(tableId)){
+		tableId = getPreDependTableId();
+	}
+	
+	if(findColValueOnTable(tableId, 1, fileId)){
+		if(!ignoreAlert){
+			alert("任务ID = " + fileId + ", 已经存在于前置依赖表中！");
+		}
+		return -1;
+	}
+	
+	var fileData = defFileSysExtByFileId('${ctx}', fileId, true);
+	var succes = fileData==null ? 0 : 1;
+	if(succes==0){
+		return -2;
+	}
+	
+	var dpTable = document.getElementById(tableId);
+	var lenOfRow = dpTable.rows.length;
+	var trow = dpTable.insertRow(-1);
+	for(var i = 0; i < 5; i++){
+		trow.insertCell();
+	}
+	
+	trow.cells[0].innerHTML = lenOfRow;
+	trow.cells[1].innerHTML = fileId + makePreDependSetStatement(fileId);
+	trow.cells[2].innerHTML = fileData.fileName;
+	trow.cells[3].innerHTML = fileData.fileType;
+	trow.cells[4].innerHTML = makeDeleteStatement(lenOfRow);
+	
+	return 0;
+}
+
+
+<%/* 
+ * updateDefPreDependFileIdsCombined
+ * unused
+ */%>
+function updateDefPreDependFileIdsCombined(){
+	var tableId = getPreDependTableId();
+	var colFileId = 2;
+	var delim = ";";
+	$("textarea#defPreDependFileIdsCombined").attr("value", getTableColumnTextContent(tableId, colFileId, delim));
+}
+
+
+
+<%/* 
+ * makeDeleteStatement
+ */%>
+function makeDeleteStatement(rowId){ 
+	var tableId = getPreDependTableId();
+	var statement = "<a href='javascript:;' onclick='deleteRowOnTable("
+		+ "\"" + tableId + "\""  + ", "
+		+ "\"" + rowId + "\"" + ");' >删除</a>";
+	
+	return statement;
+}
+
+
+<%/* 
+ * makePreDependSetStatement
+ */%>
+function makePreDependSetStatement(fileId){ 
+	var statement = '<input name="preDependSet" type="hidden" value="' + fileId + '">';
+	
+	return statement;
+}
+
+
+<%/* 
+ * getPreDependTableId
+ */%>
+function getPreDependTableId(){ 
+	return 'defFilePreDependTable';
+}
+
+
+
+<%/* 
+ * 删除行   rowid 行号
+ */%>
+function deleteRowOnTable(tableId, rowDeletedId){ 
+	var tableObj = document.getElementById(tableId);
+	var trows = tableObj.rows;
+	var rowIdx;
+	var colIdx = 0;
+	rowDeletedId = parseInt(rowDeletedId);
+	var deleted = false;
+	var i;
+	for (i = 1; i < trows.length; i++) {
+		rowIdx = parseInt(trows[i].cells[colIdx].textContent);
+		if(rowIdx==rowDeletedId){
+			tableObj.deleteRow(i);
+			deleted = true;
+			break;
+		}
+	}
+	
+	colChg = 5; // change
+	if(deleted==true){
+		for (; i < trows.length; i++) {
+			trows[i].cells[colIdx].innerHTML = i;
+			trows[i].cells[colChg].innerHTML = makeDeleteStatement(i);
+		}
+	}
+	
+	return false;
+}

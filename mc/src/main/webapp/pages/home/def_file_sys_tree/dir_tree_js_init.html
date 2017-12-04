@@ -1,0 +1,23 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * defFileSysDirTree
+ * 初始化的js，需放在 body script $(function () { 放在这里 }); 
+ * 
+ * author: taosheng
+ */%>
+
+<%/* 
+ * 开启 onClick : zDirTreeOnClick
+ * 开启 onAsyncSuccess : zDirTreeOnAsyncSuccess 只展示目录/项目
+ */%>
+
+defFileSysTreeSetting.view.selectedMulti = false;
+defFileSysTreeSetting.callback.onClick = zDirTreeOnClick;
+defFileSysTreeSetting.callback.onAsyncSuccess = zDirTreeOnAsyncSuccess;
+
+$.fn.zTree.init($("#defFileSysTree"), defFileSysTreeSetting, null);
+
+$("#expandAllBtn").bind("click", {treeId:"defFileSysTree", actionType:"expandAll"}, expandDefFileSysTreeNode);
+$("#expandSelectedBtn").bind("click", {treeId:"defFileSysTree", actionType:"expandSelected"}, expandDefFileSysTreeNode);
+$("#collapseAllBtn").bind("click", {treeId:"defFileSysTree", actionType:"collapseAll"}, expandDefFileSysTreeNode);
+$("#collapseSelectedBtn").bind("click", {treeId:"defFileSysTree", actionType:"collapseSelected"}, expandDefFileSysTreeNode);

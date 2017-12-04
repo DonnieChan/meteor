@@ -1,0 +1,46 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * 移动目录
+ * projectId 初始化传入
+ * 
+ * author: taosheng
+ */%>
+
+
+	<form name="projectMoveDirDataFormDisplay" method="post" id="projectMoveDirDataFormDisplay"  action="" onsubmit=""> 
+		<div class="control-group">
+			<label class="control-label">
+				<button id="projectMoveDirBtnDisplay" name="projectMoveDirBtnDisplay" type="button" class="btn btn-primary" onclick="toggleAndPopItem(event, '#project_move_dir_div', false);" >移动目录</button>
+			</label>
+		</div>
+	</form> 
+
+
+<div name="beCalledToReSetIFrameSizeOnParentPage" id="project_move_dir_div" class="well span12" style="display:none;" >
+	<div class="control-group span1">
+		<button type="button" class="btn btn-primary" onclick="$('button#projectMoveDirBtnDisplay').click();" >关闭</button>
+	</div>
+	
+	<form name="projectMoveDirDataForm" class="span1" method="post" id="projectMoveDirDataForm" target="_parent" action="${ctx}/dir/moveDir.do" onsubmit=""> 
+		
+		<input id="projectId" name="projectId" type="hidden" value="${defFileSys.projectId}" />
+		<input id="fileId" name="fileId" type="hidden" value="${defFileSys.fileId}" />
+		
+		<input id="parentFileId" name="parentFileId" type="hidden" value="${defFileSys.parentFileId}" />
+		
+		<div class="control-group">
+			<button id="projectMoveDirBtn" name="projectMoveDirBtn" type="submit" class="btn btn-primary" disabled >移动</button>
+		</div>
+	</form> 
+	<div class="span10" ></div>
+	
+	<!-- defFileSysTree body -->
+	<div id="rpFileTreeDirMove" name="rpFileTreeDirMove" class="span12">
+		<%@include file="../def_file_sys_tree/file_tree_body.html"%>
+	</div>
+	
+	
+	
+	
+</div>
+

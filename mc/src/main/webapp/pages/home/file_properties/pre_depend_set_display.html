@@ -1,0 +1,42 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * 前置依赖 of 创建任务
+ * 展示 已经有了的前置依赖，按表格显示
+ * 创建任务页面的初始化中，需要加上 initTable(); 
+ * 
+ * author: taosheng
+ */%>
+
+<div class="control-group">
+	<label class="control-label"></label>
+	<div class="controls" >
+	
+		<table id="defFilePreDependTable" name="defFilePreDependTable" class="table table-bordered">
+				<tr>
+					<td></td>
+					<td>任务ID</td>
+					<td>任务名称</td>
+					<td>任务类型</td>
+					<td></td>
+				</tr>
+				<c:set var="stauts" value="1"></c:set>
+				<c:forEach var="defPreDependFile" items="${defPreDependFileList}">
+					<tr>
+						<td align="center" >${stauts}</td>
+						<td>
+							${defPreDependFile.fileId}
+							<input name="preDependSet" type="hidden" value="${defPreDependFile.fileId}">
+						</td>
+						<td>${defPreDependFile.fileName}</td>
+						<td>${defPreDependFile.fileType}</td>
+						<td>
+							<a href='javascript:;' onclick='deleteRowOnTable("defFilePreDependTable", "${stauts}");' >删除</a>
+						</td>
+					</tr>
+					<c:set var="stauts" value="${stauts+1}"></c:set>
+				</c:forEach>
+		</table>
+		
+	</div>
+</div>
+
