@@ -1,0 +1,27 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * 更名子目录
+ * projectId 初始化传入
+ * 
+ * author: taosheng
+ */%>
+
+	
+	<form name="projectRenameDirDataForm" method="post" id="projectRenameDirDataForm" target="_parent" action="${ctx}/dir/renameDir.do" onsubmit=""> 
+		
+		<input id="projectId" name="projectId" type="hidden" value="${defFileSys.projectId}" />
+		<input id="fileId" name="fileId" type="hidden" value="${defFileSys.fileId}" />
+		
+		<div class="control-group">
+			<label class="control-label">目录名称</label>
+			<div class="controls">
+				<input id="fileName" name="fileName" type="text" value="${defFileSys.fileName}" placeholder="请输入子目录名称..." required ></input> 
+			</div>
+		</div>
+		
+		<div class="control-group">
+			<label class="control-label">
+				<button id="projectRenameDirBtn" name="projectRenameDirBtn" type="submit" class="btn btn-primary" >更改目录名称</button>
+			</label>
+		</div>
+	</form> 

@@ -1,0 +1,50 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * defFileSysTree
+ * 普通常用的js，为该tree而特有的
+ * 
+ * author: taosheng
+ */%>
+
+
+<!-- tree -->
+<div id="rpFileTree" name="rpFileTree" >
+	<div id="rpFileTreeTab" name="rpFileTreeTab" style="padding:10px;" >
+	
+		<div style="float:left; width:220px;"  class="ht-font-weight-bold">
+			<input name="defFileSysTreeSearch" id="defFileSysTreeSearch" type="text" style="width:200px;" placeholder="按名称搜索,框外点下即搜"
+				onblur="this.value = this.value.trim(); doPageSearchTree('defFileSysTree', this.value);" />
+			
+			<br />
+			
+			<div class="easyui-panel" style="padding:2px;width:200px;">
+				<a href="#" class="easyui-menubutton" data-options="menu:'#mm1',iconCls:'icon-add'">展开</a>
+				<a href="#" class="easyui-menubutton" data-options="menu:'#mm2',iconCls:'icon-remove'">折叠</a>
+			</div>
+			<div id="mm1" style="width:100px;">
+				<div id="expandAllBtn" href="#" title="展开全部子孙节点" onclick="return false;">
+					展开•<span class="ht-color-DarkRed">全部</span>
+				</div>
+				<div class="menu-sep"></div>
+				<div id="expandSelectedBtn" href="#" title="展开已选择的全部子孙节点" onclick="return false;">
+					展开•<span class="ht-color-OliveDrab">选中</span>
+				</div>
+			</div>
+			<div id="mm2" style="width:100px;">
+				<div id="collapseAllBtn" href="#" title="折叠全部子孙节点" onclick="return false;">
+					折叠•<span class="ht-color-DarkRed">全部</span>
+				</div>
+				<div class="menu-sep"></div>
+				<div id="collapseSelectedBtn" href="#" title="折叠已选择的全部子孙节点" onclick="return false;">
+					折叠•<span class="ht-color-OliveDrab">选中</span>
+				</div>
+			</div>
+			
+		</div>
+		
+		<div style="clear: both;" >
+			<ul id="defFileSysTree" class="nav nav-tabs nav-stacked main-menu ztree" ></ul>
+		</div>
+	</div>
+</div>
+

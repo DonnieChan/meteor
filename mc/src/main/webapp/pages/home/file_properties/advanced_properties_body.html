@@ -1,0 +1,93 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * 高级属性 of 创建任务
+ * 元素题 body
+ * 
+ * 定义任务参数为 defFileTask !!
+ * 
+ * author: taosheng
+ */%>
+
+<div class="control-group">
+	<hr />
+	<label class="control-label"></label>
+	<div class="controls">
+		<button id="advanced_properties_btn" type="button" class="btn btn-success" style="cursor: pointer;">高级属性</button>
+	</div>
+	<hr />
+</div>
+<div id="advanced_properties_body" style="display:none;" >
+	
+	<div class="control-group">
+		<label class="control-label">下线时间</label>
+		<div class="controls">
+			<c:set var="offlineTimeTmp"><fmt:formatDate value="${defFileTask.offlineTime}" pattern="yyyy-MM-dd HH:mm:ss" /></c:set>
+			<input type="text" class="Wdate" id="offlineTime" name="offlineTime" required onClick="WdatePicker({isShowClear:false,dateFmt:'yyyy-MM-dd HH:mm:ss'})" value="${offlineTimeTmp}"/>
+		</div>
+	</div>
+	
+	
+	<div class="control-group">
+		<label class="control-label">最大同时执行实例数</label>
+		<div class="controls">
+			<input name="threadPoolSize" id="threadPoolSize" type="number" required class="ht-width-p30" value="${defFileTask.threadPoolSize}" />
+			<div class="muted">表示当前任务可以同时并发处理几个时间片的数据</div>
+			<div class="muted">如：某一瞬间系统网络发生异常，导致当前任务处理速度跟不上时间片数据流入速度，出现有4个时间片数据等待处理如果配1，那就按先来后到一个个处理</div>
+			<div class="muted">在集群计算资源不是很宽裕的情况下，建议配1</div> 
+		</div>
+	</div>
+	
+	<div class="control-group">
+		<label class="control-label">优先级</label>
+		<div class="controls">
+			<input name="priority" id="priority" type="number" required class="ht-width-p30" value="${defFileTask.priority}" />
+		</div>
+	</div>
+	
+	<div class="control-group">
+		<label class="control-label">执行前睡眠毫秒数</label>
+		<div class="controls">
+			<input name="beginSleepTime" id="beginSleepTime" type="number" required class="ht-width-p30" value="${defFileTask.beginSleepTime}" />
+		</div>
+	</div>
+	
+	<div class="control-group">
+		<label class="control-label">执行完成后睡眠毫秒数</label>
+		<div class="controls">
+			<input name="finishSleepTime" id="finishSleepTime" type="number" required class="ht-width-p30" value="${defFileTask.finishSleepTime}" />
+		</div>
+	</div>
+	
+	<div class="control-group">
+		<label class="control-label">报警联系人</label>
+		<div class="controls">
+			<input name="contacts" id="contacts" type="text" placeholder="" class="ht-width-p30" value="${defFileTask.contacts}" />
+			<span class="muted">请填passport,多个用英文;号分割</span>
+		</div>
+	</div>
+	
+	<div class="control-group">
+		<label class="control-label">最大重试次数</label>
+		<div class="controls">
+			<input name="maxRetryTimes" id="maxRetryTimes" type="number" required class="ht-width-p30" value="${defFileTask.maxRetryTimes}" />
+		</div>
+	</div>
+	
+	<div class="control-group">
+		<label class="control-label">出错重试间隔毫秒数</label>
+		<div class="controls">
+			<input name="retryInterval" id="retryInterval" type="number" required class="ht-width-p30" value="${defFileTask.retryInterval}" />
+		</div>
+	</div>
+	
+	<div class="control-group">
+		<label class="control-label">最终错误是否可忽略</label>
+		<div class="controls">
+			<select name="isIgnoreError" required>
+				<option value="1" <c:if test="${defFileTask.isIgnoreError==1}">selected</c:if>>是</option>
+				<option value="0" <c:if test="${defFileTask.isIgnoreError==0}">selected</c:if>>否</option>
+			</select>
+		</div>
+	</div>
+	
+</div>

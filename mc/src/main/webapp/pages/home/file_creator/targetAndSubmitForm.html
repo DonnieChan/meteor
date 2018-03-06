@@ -1,0 +1,18 @@
+﻿<%/* 
+ * targetAndSubmitForm
+ * include file="../file_creator/targetAndSubmitForm.html"
+ * 
+ * &parentFileId=${fileId}  就是要这样的，基于 ${fileId} 来创建任务，从而为parentFileId
+ * 
+ */%>
+
+<input id="targetAfterSubmitForm" name="targetAfterSubmitForm" type="hidden" value="mainFrame" />
+
+<div class="form-actions">
+	<button id="toResetForm" type="button" class="btn btn-primary" onclick="document.location.reload();" >重&nbsp;置</button>
+	<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+	<button id="toSubmitForm" type="submit" class="btn btn-primary" >保&nbsp;存</button>
+	<span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+	<button id="toBackForm" type="button" class="btn btn-primary" onclick="history.go(-1);" >返&nbsp;回</button>
+	<span class="muted">&nbsp;&nbsp;&nbsp;&nbsp;保存后，系统会在两分钟左右，同步至线上集群运行</span>
+</div>

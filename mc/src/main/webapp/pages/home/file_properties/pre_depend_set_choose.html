@@ -1,0 +1,41 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * 前置依赖 of 创建任务
+ * 选择 前置依赖
+ * 
+ * defPreDependFileIdsCombined 存放与数据库对接的前置依赖任务的id列表，分隔符为 ControllerUtils.DELIM_IN_DEF_DEPEND_ID = ";"
+ * 
+ * author: taosheng
+ */%>
+
+<div class="control-group">
+	<hr />
+	<label class="control-label">前置依赖</label>
+	<div class="controls">
+		<button id="preDependProjectTreeOnOff" type="button" class="btn btn-success" style="cursor: pointer;" onclick="toggleAndPopItem(event, '#preDependProjectTreeTopDiv', false);">选择</button>
+		<span class="muted">&nbsp;&nbsp;&nbsp;&nbsp;选择前面哪些任务执行完，才能执行该任务</span>
+	</div>
+	<hr />
+	
+				
+
+</div>
+
+<!-- 选择：在项目树中选择前缀依赖 -->
+<div name="beCalledToReSetIFrameSizeOnParentPage" id="preDependProjectTreeTopDiv" class="ht-hero-unit" style="display:none; " >
+	<div class="control-group span1">
+		<button type="button" class="btn btn-primary" onclick="$('button#preDependProjectTreeOnOff').click();" >关闭</button>
+	</div>
+	<div class="control-group span1">
+		<button id="pre_depend_set_task_choose_btn" type="button" class="btn btn-primary" style="cursor: pointer;" disabled >选择</button>
+	</div>
+	<div class="control-group span10"></div>
+	
+	<!-- defFileSysTree body -->
+	<div id="rpFileTreePreDependSetChoose" name="rpFileTreePreDependSetChoose" class="span12">
+		<%@include file="../def_file_sys_tree/file_tree_body.html"%>
+	</div>
+</div>
+
+
+

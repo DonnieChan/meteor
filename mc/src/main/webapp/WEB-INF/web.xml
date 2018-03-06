@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+	<welcome-file-list>
+		<welcome-file>login.jsp</welcome-file>
+	</welcome-file-list>
+
+	<!-- 分钟 -->
+	<session-config>
+		<session-timeout>120</session-timeout>
+	</session-config>
+	<!-- 上下文参数配置 -->
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath*:spring/applicationContext-*.xml</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<servlet>
+		<servlet-name>springmvc</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+	    <servlet-name>springmvc</servlet-name>
+	    <url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+ 
+ 
+ 	<filter>
+		<filter-name>AuthFilter</filter-name>
+		<filter-class>com.duowan.dc.web.auth.AuthFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>AuthFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+	</filter-mapping>
+ 
+	<filter>
+		<filter-name>Set Character Encoding</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>Set Character Encoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+        <filter-name>CheckUrlFilter</filter-name>
+        <filter-class>com.duowan.meteor.mc.common.web.filter.CheckUrlFilter</filter-class>
+        <init-param>
+			<!-- 首先，看是否是下面的 可以直接通过的 url  -->
+			<param-name>skipPaths</param-name>
+			<param-value>/login.*,/loginByDC.*,/home.*,/index.*,/logout.do,/welcome.*,/help/html/*,/monitor/monitor.do</param-value>
+        </init-param>  
+        <init-param>
+			<param-name>ignoreTypes</param-name>
+			<param-value>gif,bmp,png,jpg,js,flash,css,ico</param-value>
+        </init-param>
+    </filter>
+	<filter-mapping> 
+		<filter-name>CheckUrlFilter</filter-name> 
+		<url-pattern>/*</url-pattern> 
+	</filter-mapping>	
+	
+	
+</web-app>

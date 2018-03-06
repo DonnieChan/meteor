@@ -1,0 +1,108 @@
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%/* 
+ * defFileSysDirTree
+ * 普通常用的js，为该tree而特有的
+ *
+ * 重要！！
+ * onClick: defFileSysTreeOnClick  需要在嵌入页面实现该js(相当于实现接口中的方法)，与具体业务相关，不同于 onExpand 
+ * 
+ * author: taosheng
+ */%>
+
+
+
+/** zDirTreeOnAsyncSuccess */
+function zDirTreeOnAsyncSuccess(event, treeId, treeNode, msg) {
+	displayAllDirOfOneProject(treeId, '${projectId}');
+};
+
+
+/** 显示 有效的 项目/目录节点 */ 
+function displayValidProjectAndDirNodes(event, treeId, treeNode, msg) {
+	var treeObj = $.fn.zTree.getZTreeObj(treeId);
+	var nodes = treeObj.transformToArray(treeObj.getNodes());
+	var node;
+	for(var i=0; i<nodes.length; i++){
+		node = nodes[i];
+		if( node.ext['isDir']=='1' || node.ext['isProject']=='1' ){
+			// treeObj.showNode(node);
+		}else{
+			treeObj.hideNode(node);
+		}
+	}
+	
+	// 回设本页面高度
+	onLoadWindowSelf();
+}
+
+
+/** 仅只展示该项目下的所有文件夹 */
+function displayAllDirOfOneProject(treeId, idValue){
+	var treeObj = $.fn.zTree.getZTreeObj(treeId);
+	var nodes = treeObj.getNodes();
+	var node;
+	for(var i=0; i<nodes.length; i++){
+		node = nodes[i];
+		if( node.ext['idValue']!=idValue ){
+			treeObj.hideNode(node);
+		}else{
+			treeObj.showNode(node);
+			treeObj.selectNode(node);
+			hideNonDirOfTreeNode(treeObj, node);
+			treeObj.expandNode(node, true, true, false, true);
+		}
+	}
+	
+	// 回设本页面高度
+	onLoadWindowSelf();
+}
+
+
+/** 隐藏node节点下的所有非目录 */
+function hideNonDirOfTreeNode(treeObj, treeNode) {
+	var nodes = treeObj.transformToArray(new Array(treeNode));
+	if(!isOrUndefinedNull(nodes)){
+		var node;
+		for (var i=0, l=nodes.length; i<l; i++) {
+			node = nodes[i];
+			
+			if( node.ext['isDir']=='1' || node.ext['isProject']=='1' ){
+				// treeObj.showNode(node);
+			}else{
+				treeObj.hideNode(node);
+			}
+		}
+	}
+}
+
+
+/** zDirTreeOnClick */
+function zDirTreeOnClick(event, treeId, treeNode, msg) {
+	chooseSelectedTreeNodeAsParentFileId(event, treeId, treeNode);
+};
+
+
+/** 展开 或 折叠 */
+function chooseSelectedTreeNodeAsParentFileId(event, treeId, treeNode) {
+	var divId = "div#project_move_dir_div";
+	var btnChooseId = "form#projectMoveDirDataForm button#projectMoveDirBtn";
+	var parentFileId = "form#projectMoveDirDataForm input#parentFileId";
+	
+	$(divId).show();
+	$(btnChooseId).attr("disabled", true);
+	
+	var idType = treeNode.ext['idType'];
+	var idValue = treeNode.ext['idValue'];
+	
+	if(treeNode.ext['isDir']=='0'){
+		return ;
+	}
+	
+	if(idType=='defFileSys'){
+		$(parentFileId).attr("value", idValue);
+		$(btnChooseId).attr("disabled", false);
+	}
+	
+	return false;
+}
+
