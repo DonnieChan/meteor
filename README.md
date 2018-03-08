@@ -56,3 +56,8 @@
 	from $targetTable
 	group by stime_yyyyMMdd
 </pre>
+
+三、安装
+---------------------
+<pre>
+</pre>
