@@ -3,7 +3,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%
-	request.setAttribute("ctx", com.duowan.meteor.mc.utils.ControllerUtils.httpFlag);
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path + "/";
+	request.setAttribute("ctx", path);
 %>
 
 <!DOCTYPE html>

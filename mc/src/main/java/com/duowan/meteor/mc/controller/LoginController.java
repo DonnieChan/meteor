@@ -18,7 +18,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.duowan.meteor.mc.common.controller.UserBaseController;
-import com.duowan.meteor.mc.utils.ControllerUtils;
 
 
 @Controller
@@ -26,9 +25,9 @@ public class LoginController extends UserBaseController {
 
 	private Log log = LogFactory.getLog(this.getClass());
 
-	public static final String ADMIN_IN_COOKIE_KEY = "com.yy.game.meteor.mc.cookie";
+	public static final String ADMIN_IN_COOKIE_KEY = "meteor.mc.cookie";
 
-	public static final String ADMIN_IN_PASSPORT_KEY = "com.yy.game.meteor.mc.login.passport";
+	public static final String ADMIN_IN_PASSPORT_KEY = "meteor.mc.passport";
 
 	/** Cookie 值分割符 */
 	public static final String COOKIE_SPLIT_FLAG = "`==`";
@@ -46,12 +45,6 @@ public class LoginController extends UserBaseController {
 	@RequestMapping("/login.do")
 	public String login(String passport, String password, HttpServletRequest request, HttpServletResponse response, ModelMap model) throws IOException {
 		log.info("run login");
-		String dwENV = System.getenv("DWENV");
-		log.info("dwENV = " + dwENV);
-		if (StringUtils.equals(dwENV, "prod")) {
-			return "redirect:https://portal.hiido.com/";
-		}
-
 		if (!validateLogin(passport, password)) {
 			return "login";
 		}
@@ -59,7 +52,7 @@ public class LoginController extends UserBaseController {
 
 		setLoginCookie(passport);
 
-		return "redirect:" + ControllerUtils.httpFlag + "/home.do";
+		return "redirect:/home.do";
 	}
 
 	private boolean validateLogin(String passport, String password) {
@@ -75,10 +68,6 @@ public class LoginController extends UserBaseController {
 			model.addAttribute("errorMessage", "密码不能为空!");
 			return false;
 		}
-		if (!"dcmeteor321".equals(password)) {
-			model.addAttribute("errorMessage", "通行证或是密码有错误!");
-			return false;
-		}
 
 		return true;
 	}
@@ -92,7 +81,7 @@ public class LoginController extends UserBaseController {
 	public String logout(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
 		session.invalidate();
-		return "redirect:" + ControllerUtils.httpFlag + "/login.do";
+		return "redirect:/login.do";
 	}
 
 	

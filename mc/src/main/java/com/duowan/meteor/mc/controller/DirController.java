@@ -13,7 +13,6 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.duowan.meteor.mc.common.controller.UserBaseController;
-import com.duowan.meteor.mc.utils.ControllerUtils;
 import com.duowan.meteor.model.db.DefFileSys;
 import com.duowan.meteor.model.view.other.Dir;
 import com.duowan.meteor.service.DefFileSysService;
@@ -57,7 +56,7 @@ public class DirController extends UserBaseController {
 
 		dir = (Dir) taskService.addTask(dir);
 
-		return "redirect:" + ControllerUtils.httpFlag + "/schedule/index.do?projectId=" + dir.getProjectId() + "&fileId=" + dir.getFileId();
+		return "redirect:/schedule/index.do?projectId=" + dir.getProjectId() + "&fileId=" + dir.getFileId();
 	}
 
 	/**
@@ -80,7 +79,7 @@ public class DirController extends UserBaseController {
 
 		defFileSysService.update(defFileSys);
 
-		return "redirect:" + ControllerUtils.httpFlag + "/schedule/index.do?projectId=" + defFileSys.getProjectId() + "&fileId=" + defFileSys.getFileId();
+		return "redirect:/schedule/index.do?projectId=" + defFileSys.getProjectId() + "&fileId=" + defFileSys.getFileId();
 	}
 
 	/**
@@ -106,7 +105,7 @@ public class DirController extends UserBaseController {
 
 		defFileSysService.update(defFileSys);
 
-		return "redirect:" + ControllerUtils.httpFlag + "/schedule/index.do?projectId=" + defFileSys.getProjectId() + "&fileId=" + defFileSys.getFileId();
+		return "redirect:/schedule/index.do?projectId=" + defFileSys.getProjectId() + "&fileId=" + defFileSys.getFileId();
 	}
 
 }

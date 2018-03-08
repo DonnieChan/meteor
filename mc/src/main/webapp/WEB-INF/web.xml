@@ -31,17 +31,6 @@
 	    <url-pattern>*.do</url-pattern>
 	</servlet-mapping>
  
- 
- 	<filter>
-		<filter-name>AuthFilter</filter-name>
-		<filter-class>com.duowan.dc.web.auth.AuthFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>AuthFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-		<dispatcher>REQUEST</dispatcher>
-	</filter-mapping>
- 
 	<filter>
 		<filter-name>Set Character Encoding</filter-name>
 		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -61,7 +50,7 @@
         <init-param>
 			<!-- 首先，看是否是下面的 可以直接通过的 url  -->
 			<param-name>skipPaths</param-name>
-			<param-value>/login.*,/loginByDC.*,/home.*,/index.*,/logout.do,/welcome.*,/help/html/*,/monitor/monitor.do</param-value>
+			<param-value>/login.*,/home.*,/index.*,/logout.do,/welcome.*,/help/html/*,/monitor/monitor.do</param-value>
         </init-param>  
         <init-param>
 			<param-name>ignoreTypes</param-name>

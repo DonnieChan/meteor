@@ -19,14 +19,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
 
 import com.duowan.meteor.mc.common.controller.UserBaseController;
-import com.duowan.meteor.mc.utils.ControllerUtils;
 
 public class CheckUrlFilter implements Filter {
 
 	private static Logger logger = (Logger) LoggerFactory.getLogger(CheckUrlFilter.class);
 
-	public static final String LOGIN_PAGE = ControllerUtils.httpFlag + "/login.jsp";
-	public static final String ERROR_PAGE = ControllerUtils.httpFlag + "/error.jsp";
+	public static final String LOGIN_PAGE = "/login.jsp";
+	public static final String ERROR_PAGE = "/error.jsp";
 	public static final String MULTIPART = "multipart/";
 
 	/** 不需要验证的请求 */

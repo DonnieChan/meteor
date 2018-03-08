@@ -5,7 +5,6 @@ import java.io.Writer;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -19,15 +18,6 @@ import com.duowan.meteor.model.view.AbstractBase;
 public class ControllerUtils {
 
 	static Logger logger = LoggerFactory.getLogger(ControllerUtils.class);
-	
-	public static String httpFlag = "https://mc.meteor.com";
-	
-	static {
-		String dwenv = System.getenv("DWENV");
-		if (!StringUtils.equals(dwenv, "prod")) {
-			httpFlag = "http://mc.meteor.com";
-		}
-	}
 
 	/**
 	 * 写入 response

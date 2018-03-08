@@ -104,7 +104,7 @@ public class ScheduleController extends UserBaseController {
 		Assert.notNull(defFileSys, "Wrong!! fileId[Id=" + fileId + "]'s file must not be null!");
 		Assert.isTrue(projectId.intValue() == defFileSys.getProjectId(), "Wrong!! fileId[Id=" + fileId + "]'s projectId[Id=" + projectId + "] must not be the same to the input projectId from url!");
 
-		return "redirect:" + ControllerUtils.httpFlag + "/task/read.do" + "?projectId=" + projectId + "&fileId=" + fileId + "&fileType=" + defFileSys.getFileType();
+		return "redirect:/task/read.do" + "?projectId=" + projectId + "&fileId=" + fileId + "&fileType=" + defFileSys.getFileType();
 	}
 
 	@RequestMapping("/nPId/getFileById.do")

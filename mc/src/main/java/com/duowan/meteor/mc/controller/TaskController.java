@@ -12,7 +12,6 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.duowan.meteor.mc.common.controller.UserBaseController;
-import com.duowan.meteor.mc.utils.ControllerUtils;
 import com.duowan.meteor.model.db.DefFileSys;
 import com.duowan.meteor.model.enumtype.FileType;
 import com.duowan.meteor.model.view.AbstractBase;
@@ -166,7 +165,7 @@ public class TaskController extends UserBaseController {
 		Assert.notNull(fileId, "Wrong!! fileId must not be null!");
 		DefFileSys defFileSys = defFileSysService.getById(fileId);
 		taskService.deleteTask(fileId);
-		return "redirect:" + ControllerUtils.httpFlag + "/schedule/index.do?projectId=" + defFileSys.getProjectId() + (fileId == 0 ? "" : ("&fileId=" + defFileSys.getParentFileId()));
+		return "redirect:/schedule/index.do?projectId=" + defFileSys.getProjectId() + (fileId == 0 ? "" : ("&fileId=" + defFileSys.getParentFileId()));
 	}
 
 	/**
@@ -178,7 +177,7 @@ public class TaskController extends UserBaseController {
 		DefFileSys defFileSys = defFileSysService.getById(fileId);
 		defFileSys.setOfflineTime(DateUtils.addMinutes(new Date(), -1));
 		defFileSysService.update(defFileSys);
-		return "redirect:" + ControllerUtils.httpFlag + "/schedule/index.do?projectId=" + defFileSys.getProjectId() + (fileId == 0 ? "" : ("&fileId=" + defFileSys.getParentFileId()));
+		return "redirect:/schedule/index.do?projectId=" + defFileSys.getProjectId() + (fileId == 0 ? "" : ("&fileId=" + defFileSys.getParentFileId()));
 	}
 
 }

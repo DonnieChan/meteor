@@ -6,7 +6,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.duowan.meteor.mc.common.controller.UserBaseController;
-import com.duowan.meteor.mc.utils.ControllerUtils;
 
 
 @Controller
@@ -16,7 +15,7 @@ public class IndexController extends UserBaseController {
 	public String home(ModelMap model) {
 		String passport = getLoginPassport();
 		if (StringUtils.isBlank(passport)) {
-			return "redirect:" + ControllerUtils.httpFlag + "/login.do";
+			return "redirect:/login.do";
 		}
 		model.put("passport", passport);
 		model.put("projectName", "流星实时数据开发平台");
