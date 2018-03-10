@@ -9,7 +9,7 @@
 		<property name="ignoreUnresolvablePlaceholders" value="true" />
 		<property name="locations">
 			<list>
-				<value>classpath*:app-${DWENV}.properties</value>
+				<value>classpath*:app-meteor.properties</value>
 			</list>
 		</property>
 	</bean>
