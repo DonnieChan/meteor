@@ -50,7 +50,6 @@
 	--备注：多维度统一统计，减少统计sql量，有一定性能优化效果。
 	csql_group_by_n:
 	select stime, stime_yyyyMMdd, platform, product, game, server,
-	
 	    --备注：相当于 group by stime_yyyyMMdd, platform; count(distinct uid) 
 	    c_count_distinct('rediss_multil0', 'redis_platform_uv', key(stime_yyyyMMdd, platform), value(uid), 5000, ${DateUtils2.expireAtDay(1, 0, 50)}, 0) platform_uv,
 	    
