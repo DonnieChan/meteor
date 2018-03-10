@@ -22,9 +22,8 @@ public class RedisInstance {
 	private RedisInstance() {
 		String redisHost = System.getProperty("redisHost");
 		int redisPort = Integer.parseInt(System.getProperty("redisPort"));
-		String redisPassword = System.getProperty("redisPassword");
-		logger.info("redisHost={}, redisPort={}, redisPassword={}", new Object[] {redisHost, redisPort, redisPassword});
-		jedisPool = new JedisPool(new GenericObjectPoolConfig(), redisHost, redisPort, Protocol.DEFAULT_TIMEOUT, redisPassword, Protocol.DEFAULT_DATABASE);
+		logger.info("redisHost={}, redisPort={}", new Object[] {redisHost, redisPort});
+		jedisPool = new JedisPool(new GenericObjectPoolConfig(), redisHost, redisPort, Protocol.DEFAULT_TIMEOUT, null, Protocol.DEFAULT_DATABASE);
 		Jedis jedis = jedisPool.getResource();
 		String script = "local redisKey = KEYS[1] "
 				+ "local curTime = ARGV[1] "
