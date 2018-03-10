@@ -43,8 +43,8 @@
 	    date_format(value_arr[1], 'yyyyMMddHHmm') stime_yyyyMMddHHmm,
 	    cast(1 as bigint) one_num
 	from dwd_pay_log_tmp t1
-	--备注： dim_product 为每隔10分钟，从mysql刷新至redis，此处用于join
-	LATERAL VIEW json_tuple(c_join('rediss_multil0', 'dim_product', t1.product, true, true), 'platform') t2 as dp_platform
+	--备注： dim_product，从mysql定时刷新至redis，此处用于join
+	LATERAL VIEW json_tuple(c_join('rediss_multil0', 'dim.dim_product', t1.product, true, true), 'platform') t2 as dp_platform
 
 5、统计
 	--备注：多维度统一统计，减少统计sql量，有一定性能优化效果。
@@ -105,7 +105,7 @@
 	group by stime_yyyyMMdd, game, server
 
 7、UDF
-	1、c_join、c_count_distinct、c_sum、c_max、c_min、c_max_top_n这些自定义UDF参数含义，请用关键字搜索server模块代码查阅。
+	1、c_join、c_count_distinct、c_sum、c_max、c_min、c_max_top_n这些自定义UDF参数含义，请用关键字搜索server模块通过原码查阅。
 	2、原生可用的UDF：https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF
 	
 </pre>

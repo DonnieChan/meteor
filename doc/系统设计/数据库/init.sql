@@ -18,4 +18,4 @@ INSERT INTO def_file_type(file_type, file_type_desc, file_type_category, depend_
 
 
 INSERT INTO def_project(project_id, project_name, remarks, is_valid, update_time, create_user, update_user) VALUES
-(100, 'test', '', 1, now(), 'sys', 'sys');
+(100, 'root', '', 1, now(), 'sys', 'sys');
