@@ -150,10 +150,10 @@
 	scp /data/apps/meteor/meteor-datasync-1.0-SNAPSHOT-jar-with-dependencies.jar spark@192.168.1.12:/data/apps/meteor/
 
 5、初始化mysql
-    source /data/src/meteor/doc/系统设计/数据库/quartz集群/tables_mysql_innodb.sql
-    source /data/src/meteor/doc/系统设计/数据库/create.sql
-    source /data/src/meteor/doc/系统设计/数据库/init.sql
-    source /data/src/meteor/doc/系统设计/数据库/test.sql
+	source /data/src/meteor/doc/系统设计/数据库/quartz集群/tables_mysql_innodb.sql
+	source /data/src/meteor/doc/系统设计/数据库/create.sql
+	source /data/src/meteor/doc/系统设计/数据库/init.sql
+	source /data/src/meteor/doc/系统设计/数据库/test.sql
 
 6、在kafka中创建好3个topic：instance_flow、instance_task、performance
 
