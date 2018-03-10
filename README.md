@@ -103,7 +103,12 @@
 	    MAX(game_server_pay_min) game_server_pay_min,
 	    MAX(game_server_top_20) game_server_top_20
 	from dm_day_stat
-	group by stime_yyyyMMdd, game, server	
+	group by stime_yyyyMMdd, game, server
+
+7、UDF
+	1、c_join、c_count_distinct、c_sum、c_max、c_min、c_max_top_n这些自定义UDF参数含义，请用关键字搜索server模块代码查阅。
+	2、原生可用的UDF：https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF
+	
 </pre>
 
 三、安装
