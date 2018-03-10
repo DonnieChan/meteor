@@ -113,5 +113,84 @@
 三、安装
 ---------------------
 <pre>
-待录
+假设有3台机器，配置cpu 24 cores，内存64G
+192.168.1.10
+192.168.1.11
+192.168.1.12
+
+另有
+已装好的kafka(端口9092)和zookeeper(端口2181)：192.168.1.20, 192.168.1.21, 192.168.1.22
+已装好的单机版redis：192.168.1.30:6380, 192.168.1.31:6380, 192.168.1.32:6380
+已装好的mysql：192.168.1.41:6666
+
+1、3台都要安装jdk1.8
+
+2、3台都要执行：
+	sudo -s su - root
+	useradd -s /bin/bash -p abc123 -m spark
+	mkdir -p /data/apps/meteor
+	chown -R spark:spark /data/apps
+	
+3、无密码ssh
+	在192.168.1.10执行
+	sudo -s su - spark
+	cd ~
+	ssh-keygen -t rsa（一直按空格键）
+	cat /home/spark/.ssh/id_rsa.pub >> /home/spark/.ssh/authorized_keys
+	跟着将authorized_keys复制到另外2台，路径一致
+	
+4、打包
+	下载该平台源码至192.168.1.10，路径为：/data/src/meteor
+	执行mvn clean install -Dmaven.test.skip=true
+	cp /data/src/meteor/server/target/meteor-server-1.0-SNAPSHOT-jar-with-dependencies.jar /data/apps/meteor/
+	cp /data/src/meteor/datasync/target/meteor-datasync-1.0-SNAPSHOT-jar-with-dependencies.jar /data/apps/meteor/
+	cp /data/src/meteor/jetty-server/target/meteor-jetty-server-1.0-SNAPSHOT-jar-with-dependencies.jar /data/apps/meteor/
+	cp /data/src/meteor/shell/meteor_shell.sh /data/apps/meteor/
+	scp /data/apps/meteor/meteor-datasync-1.0-SNAPSHOT-jar-with-dependencies.jar spark@192.168.1.11:/data/apps/meteor/
+	scp /data/apps/meteor/meteor-datasync-1.0-SNAPSHOT-jar-with-dependencies.jar spark@192.168.1.12:/data/apps/meteor/
+
+5、初始化mysql
+    source /data/src/meteor/doc/系统设计/数据库/quartz集群/tables_mysql_innodb.sql
+    source /data/src/meteor/doc/系统设计/数据库/create.sql
+    source /data/src/meteor/doc/系统设计/数据库/init.sql
+    source /data/src/meteor/doc/系统设计/数据库/test.sql
+
+6、在kafka中创建好3个topic：instance_flow、instance_task、performance
+
+7、启动web
+	在192.168.1.10
+	java -Xms1024m -Xmx1024m -cp /data/src/meteor/jetty-server/target/meteor-jetty-server-1.0-SNAPSHOT-jar-with-dependencies.jar com.meteor.jetty.server.JettyServer "/data/src/meteor/mc/target/meteor-mc-1.0-SNAPSHOT.war" "/" "8070" > mc.log 2>&1 &
+	java -Xms1024m -Xmx1024m -cp /data/src/meteor/jetty-server/target/meteor-jetty-server-1.0-SNAPSHOT-jar-with-dependencies.jar com.meteor.jetty.server.JettyServer "/data/src/meteor/transfer/target/meteor-transfer-1.0-SNAPSHOT.war" "/" "8090" > transfer.log 2>&1 &
+	通过http://192.168.1.10:8070/login.do登录web前台
+	
+8、安装spark（版本只能是2.1.0）
+	在192.168.1.10的spark用户
+	cd /data/apps/
+	wget https://archive.apache.org/dist/spark/spark-2.1.0/spark-2.1.0-bin-hadoop2.7.tgz
+	tar -zxvf spark-2.1.0-bin-hadoop2.7.tgz
+	ln -s spark-2.1.0-bin-hadoop2.7 spark
+	mkdir -p /data/apps/spark/work/cron/
+	cp /meteor/config/demo/* /data/apps/spark/conf/
+	
+	rm -fr spark-2.1.0-bin-hadoop2.7.tgz
+	tar -zcvf spark-2.1.0-bin-hadoop2.7.tgz spark-2.1.0-bin-hadoop2.7
+	scp spark-2.1.0-bin-hadoop2.7.tgz spark@192.168.1.11:/data/apps/
+	scp spark-2.1.0-bin-hadoop2.7.tgz spark@192.168.1.12:/data/apps/
+	
+	去另两台机解压，并做ln -s spark-2.1.0-bin-hadoop2.7 spark
+	
+9、启动spark
+	在192.168.1.10的spark用户
+	/data/apps/spark/sbin/start-all.sh
+	web地址：http://192.168.1.10:8080
+	
+10、启动driver
+	在192.168.1.10的spark用户
+	/data/apps/meteor/meteor_shell.sh restart
+	web地址：http://192.168.1.10:4040
+	
+	查看driver日志：tail -Fn 200 /data/apps/spark/work/work_test.log
+	
+	查看executor日志：tail -Fn 200 /data/apps/spark/work/work.log
+	
 </pre>
