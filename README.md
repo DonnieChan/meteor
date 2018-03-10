@@ -141,6 +141,7 @@
 	
 4、打包
 	下载该平台源码至192.168.1.10，路径为：/data/src/meteor
+	换需更改mysql连接信息：/data/src/meteor/meteor-dao/src/main/resources/app-meteor.properties
 	执行mvn clean install -Dmaven.test.skip=true
 	cp /data/src/meteor/server/target/meteor-server-1.0-SNAPSHOT-jar-with-dependencies.jar /data/apps/meteor/
 	cp /data/src/meteor/datasync/target/meteor-datasync-1.0-SNAPSHOT-jar-with-dependencies.jar /data/apps/meteor/
