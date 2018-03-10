@@ -48,13 +48,17 @@
 5、统计
 	csql_group_by_n:
 	select stime, stime_yyyyMMdd, platform, product, game, server,
-		--备注：相当于 group by stime_yyyyMMdd, platform；count(distinct uid) 
+        --备注：相当于 group by stime_yyyyMMdd, platform; count(distinct uid) 
 	    c_count_distinct('rediss_multil0', 'redis_platform_uv', key(stime_yyyyMMdd, platform), value(uid), 5000, ${DateUtils2.expireAtDay(1, 0, 50)}, 0) platform_uv,
-	    --备注：相当于 group by stime_yyyyMMdd, product；count(1) 
-	    c_sum('rediss_multil0', 'redis_product_cnt', stime_yyyyMMdd, key(product), one_num, 5000, ${DateUtils2.expireAtDay(1, 0, 50)}) product_cnt,
-	    --备注：相当于 group by stime_yyyyMMdd, game, server；sum(pay_coin) 
+	    --备注：相当于 group by stime_yyyyMMdd, product; count(1) 
+	    c_sum('rediss_multil0', 'redis_product_count', stime_yyyyMMdd, key(product), one_num, 5000, ${DateUtils2.expireAtDay(1, 0, 50)}) product_count,
+	    --备注：相当于 group by stime_yyyyMMdd, game, server; sum(pay_coin) 
 	    c_sum('rediss_multil0', 'redis_game_server_pay_sum', stime_yyyyMMdd, key(game, server), pay_coin, 5000, ${DateUtils2.expireAtDay(1, 0, 50)}) game_server_pay_sum,
-	    --备注：相当于group by stime_yyyyMMdd, game；取top 20的server及对应的pay_coin
+	    --备注：相当于 group by stime_yyyyMMdd, game, server; max(pay_coin) 
+	    c_max('rediss_multil0', 'redis_game_server_pay_max', stime_yyyyMMdd, key(game, server), pay_coin, 5000, ${DateUtils2.expireAtDay(1, 0, 50)}) game_server_pay_max,
+	    --备注：相当于 group by stime_yyyyMMdd, game, server; sum(pay_coin) 
+	    c_min('rediss_multil0', 'redis_game_server_pay_min', stime_yyyyMMdd, key(game, server), pay_coin, 5000, ${DateUtils2.expireAtDay(1, 0, 50)}) game_server_pay_min,
+	    --备注：相当于group by stime_yyyyMMdd, game; 取top 20的server及对应的pay_coin
 	    c_max_top_n('rediss_multil0', 'redis_game_server_top_20', key(stime_yyyyMMdd, game), server, pay_coin, 20, 5000, ${DateUtils2.expireAtDay(1, 0, 50)}) game_server_top_20
 	from dwd_pay_log
 	group by stime_yyyyMMdd, platform, product, game, server
@@ -63,8 +67,10 @@
 	cache table dm_day_stat
 	select MAX(stime) stime, stime_yyyyMMdd, platform, product, game, server,
 	    MAX(platform_uv) platform_uv,
-	    MAX(product_cnt) product_cnt,
+	    MAX(product_cnt) product_count,
 	    MAX(game_server_pay_sum) game_server_pay_sum,
+	    MAX(game_server_pay_max) game_server_pay_max,
+	    MAX(game_server_pay_min) game_server_pay_min,
 	    MAX(game_server_top_20) game_server_top_20
 	from $targetTable
 	group by stime_yyyyMMdd, platform, product, game, server
