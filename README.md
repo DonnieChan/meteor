@@ -20,41 +20,54 @@
 <pre>
 1、kafka的数据格式如下：
 	key                 value
-	product1            uid1|2018-03-07 19:25:00|login
-	product1            uid1|2018-03-07 19:26:00|heartbeat
-	product1            uid1|2018-03-07 19:27:00|heartbeat
-	product1            uid2|2018-03-07 19:28:00|logout
-	product1            uid2|2018-03-07 20:25:00|login
-	product1            uid2|2018-03-07 20:26:00|heartbeat
-	product1            uid2|2018-03-07 20:27:00|heartbeat
-	product1            uid2|2018-03-07 20:28:00|logout
+	product1            uid1|2018-03-07 19:25:00|game1|server1|100
+	product2            uid2|2018-03-07 19:26:00|game1|server2|200
+	product3            uid3|2018-03-07 19:27:00|game1|server3|300
+	product4            uid4|2018-03-07 19:28:00|game1|server4|400
 
-2、将kafka的数据注册成表ods_user_log，比如配置spark-stream按分钟拉取
+2、将kafka的数据注册成表ods_pay_log，比如配置spark-stream按分钟拉取
 
 3、转换sql1
-	cache table dwd_user_log_tmp as
+	cache table dwd_pay_log_tmp as
 	select key as product, split(value, '|') value_arr
-	from ods_user_log
+	from ods_pay_log
 
 4、转换sql2
-	cache table dwd_user_log as
-	select product, value_arr[0] uid, value_arr[1] stime, value_arr[2] action,
+	cache table dwd_pay_log as
+	select product, value_arr[0] uid, value_arr[1] stime, value_arr[2] game, value_arr[3] server, 
+	  cast(value_arr[4] as bigint) pay_coin,
+	  t2.dp_platform as platform, 
 	  date_format(value_arr[1], 'yyyyMMdd') stime_yyyyMMdd, 
 	  date_format(value_arr[1], 'yyyyMMddHH') stime_yyyyMMddHH, 
 	  date_format(value_arr[1], 'yyyyMMddHHmm') stime_yyyyMMddHHmm,
 	  cast(1 as bigint) one_num
-	from dwd_user_log_tmp
+	from dwd_pay_log_tmp t1
+	--备注： dim_product 为每隔10分钟，从mysql刷新至redis，此处用于join
+	LATERAL VIEW json_tuple(c_join('rediss_multil0', 'dim_product', t1.product, true, true), 'platform') t2 as dp_platform
 
-5、统计天UV
+5、统计
 	csql_group_by_n:
-	select stime, stime_yyyyMMdd,
-	    c_count_distinct('rediss_multil0', 'redis_prekey_uv', key(stime_yyyyMMdd), value(uid), 5000, ${DateUtils2.expireAtDay(1, 1, 30)}, 0) uv_val
-	from dwd_user_log
-	group by stime_yyyyMMdd
+	select stime, stime_yyyyMMdd, platform, product, game, server,
+		--备注：相当于 group by stime_yyyyMMdd, platform；count(distinct uid) 
+	    c_count_distinct('rediss_multil0', 'redis_platform_uv', key(stime_yyyyMMdd, platform), value(uid), 5000, ${DateUtils2.expireAtDay(1, 0, 50)}, 0) platform_uv,
+	    --备注：相当于 group by stime_yyyyMMdd, product；count(1) 
+	    c_sum('rediss_multil0', 'redis_product_cnt', stime_yyyyMMdd, key(product), one_num, 5000, ${DateUtils2.expireAtDay(1, 0, 50)}) product_cnt,
+	    --备注：相当于 group by stime_yyyyMMdd, game, server；sum(pay_coin) 
+	    c_sum('rediss_multil0', 'redis_game_server_pay_sum', stime_yyyyMMdd, key(game, server), pay_coin, 5000, ${DateUtils2.expireAtDay(1, 0, 50)}) game_server_pay_sum,
+	    --备注：相当于group by stime_yyyyMMdd, game；取top 20的server及对应的pay_coin
+	    c_max_top_n('rediss_multil0', 'redis_game_server_top_20', key(stime_yyyyMMdd, game), server, pay_coin, 20, 5000, ${DateUtils2.expireAtDay(1, 0, 50)}) game_server_top_20
+	from dwd_pay_log
+	group by stime_yyyyMMdd, platform, product, game, server
 	;
-	select MAX(stime) stime, stime_yyyyMMdd, MAX(uv_val) uv_val
+	--备注：相当于对各分区做一次去重复，减少输出结果的条数
+	cache table dm_day_stat
+	select MAX(stime) stime, stime_yyyyMMdd, platform, product, game, server,
+	    MAX(platform_uv) platform_uv,
+	    MAX(product_cnt) product_cnt,
+	    MAX(game_server_pay_sum) game_server_pay_sum,
+	    MAX(game_server_top_20) game_server_top_20
 	from $targetTable
-	group by stime_yyyyMMdd
+	group by stime_yyyyMMdd, platform, product, game, server
 </pre>
 
 三、安装
