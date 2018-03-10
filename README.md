@@ -18,7 +18,7 @@
 二、架构
 ---------------------
 ![image](https://github.com/meteorchenwu/meteor/blob/master/doc/ppt/meteor%E6%9E%B6%E6%9E%841.jpg)
-![image](https://github.com/meteorchenwu/meteor/blob/master/doc/ppt/meteor%E6%9E%B6%E6%9E%841.jpg)
+![image](https://github.com/meteorchenwu/meteor/blob/master/doc/ppt/meteor%E6%9E%B6%E6%9E%842.jpg)
 
 三、示例
 ---------------------
