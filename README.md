@@ -15,7 +15,12 @@
 支持小表join
 </pre>
 
-二、示例
+二、架构
+---------------------
+![image](https://github.com/meteorchenwu/meteor/doc/ppt/meteor架构1.jpg)
+![image](https://github.com/meteorchenwu/meteor/doc/ppt/meteor架构2.jpg)
+
+三、示例
 ---------------------
 <pre>
 1、kafka的数据格式如下：
@@ -110,7 +115,7 @@
 	
 </pre>
 
-三、安装
+四、安装
 ---------------------
 <pre>
 假设有3台机器，配置cpu 24 cores，内存64G
