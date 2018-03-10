@@ -179,12 +179,12 @@
 	
 	去另两台机解压，并做ln -s spark-2.1.0-bin-hadoop2.7 spark
 	
-9、启动spark
+9、启动spark集群
 	在192.168.1.10的spark用户
 	/data/apps/spark/sbin/start-all.sh
 	web地址：http://192.168.1.10:8080
 	
-10、启动driver
+10、提交driver
 	在192.168.1.10的spark用户
 	/data/apps/meteor/meteor_shell.sh restart
 	web地址：http://192.168.1.10:4040
