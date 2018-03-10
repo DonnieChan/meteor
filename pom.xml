@@ -595,5 +595,6 @@
 		<module>transfer</module>
 		<module>datasync</module>
 		<module>task</module>
+		<module>jetty-server</module>
 	</modules>
 </project>
