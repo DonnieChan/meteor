@@ -86,6 +86,8 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem
 import net.sf.jsqlparser.statement.select.SelectItem
 import net.sf.jsqlparser.statement.select.SelectItemVisitor
 import net.sf.jsqlparser.statement.select.SubSelect
+import java.security.MessageDigest
+import org.apache.commons.codec.binary.Hex
 
 /**
  * Created by Administrator on 2015/8/19 0019.
@@ -274,12 +276,13 @@ object CustomSQLUtil extends Logging {
                     val isAccurate = paramList(6).asInstanceOf[LongValue].getValue
                     val funcOpMap = scala.collection.mutable.Map[String, Any]()
                     val valSetMap = scala.collection.mutable.Map[String, java.util.HashSet[String]]()
-
+                    
+                    val messageDigest = MessageDigest.getInstance("MD5")
                     for (r <- p) {
                       val keyColValues = keyCols.map { x => r.getAs(x).toString() }.toList.mkString("|")
                       val valColValues = valCols.map { x => r.getAs(x).toString() }.toList.mkString("|")
                       val redisKey = s"$keyColValues|$redisPreKey"
-                      val redisKeyMD5 = DigestUtils.md5Hex(redisKey)
+                      val redisKeyMD5 = Hex.encodeHexString(messageDigest.digest(redisKey.getBytes("UTF-8")))
                       val valSet = valSetMap.getOrElseUpdate(redisKeyMD5, new java.util.HashSet[String]())
                       valSet.add(valColValues)
                     }
@@ -377,11 +380,12 @@ object CustomSQLUtil extends Logging {
                     val funcOpMap = scala.collection.mutable.Map[String, Any]()
                     val parMapKeyMap = scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Long]]()
 
+                    val messageDigest = MessageDigest.getInstance("MD5")
                     for (r <- p) {
                       val partitionColValue = r.getAs(partitionCol).toString()
                       val keyColValues = keyCols.map { x => r.getAs(x).toString() }.toList.mkString("|")
                       val pKeyColValues = s"$keyColValues|$partitionColValue"
-                      val pKeyColValuesMD5 = DigestUtils.md5Hex(pKeyColValues)
+                      val pKeyColValuesMD5 = Hex.encodeHexString(messageDigest.digest(pKeyColValues.getBytes("UTF-8")))
                       val valColValue = r.getAs[Long](valCol)
                       val keyMap = parMapKeyMap.getOrElseUpdate(partitionColValue, scala.collection.mutable.Map[String, Long]())
                       val sum = keyMap.getOrElseUpdate(pKeyColValuesMD5, 0L)
@@ -465,11 +469,12 @@ object CustomSQLUtil extends Logging {
                     val funcOpMap = scala.collection.mutable.Map[String, Any]()
                     val parMapKeyMap = scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Long]]()
 
+                    val messageDigest = MessageDigest.getInstance("MD5")
                     for (r <- p) {
                       val partitionColValue = r.getAs(partitionCol).toString()
                       val keyColValues = keyCols.map { x => r.getAs(x).toString() }.toList.mkString("|")
                       val pKeyColValues = s"$keyColValues|$partitionColValue"
-                      val pKeyColValuesMD5 = DigestUtils.md5Hex(pKeyColValues)
+                      val pKeyColValuesMD5 = Hex.encodeHexString(messageDigest.digest(pKeyColValues.getBytes("UTF-8")))
                       val valColValue = r.getAs[Long](valCol)
                       val keyMap = parMapKeyMap.getOrElseUpdate(partitionColValue, scala.collection.mutable.Map[String, Long]())
                       val max = keyMap.getOrElseUpdate(pKeyColValuesMD5, 0L)
@@ -555,11 +560,12 @@ object CustomSQLUtil extends Logging {
                     val funcOpMap = scala.collection.mutable.Map[String, Any]()
                     val parMapKeyMap = scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Long]]()
 
+                    val messageDigest = MessageDigest.getInstance("MD5")
                     for (r <- p) {
                       val partitionColValue = r.getAs(partitionCol).toString()
                       val keyColValues = keyCols.map { x => r.getAs(x).toString() }.toList.mkString("|")
                       val pKeyColValues = s"$keyColValues|$partitionColValue"
-                      val pKeyColValuesMD5 = DigestUtils.md5Hex(pKeyColValues)
+                      val pKeyColValuesMD5 = Hex.encodeHexString(messageDigest.digest(pKeyColValues.getBytes("UTF-8")))
                       val valColValue = r.getAs[Long](valCol)
                       val keyMap = parMapKeyMap.getOrElseUpdate(partitionColValue, scala.collection.mutable.Map[String, Long]())
                       val min = keyMap.getOrElseUpdate(pKeyColValuesMD5, 0L)
@@ -648,12 +654,13 @@ object CustomSQLUtil extends Logging {
                     val keyTopNCountMap = scala.collection.mutable.Map[String, Int]()
                     val tmpDataMap = new java.util.HashMap[String, Long]()
 
+                    val messageDigest = MessageDigest.getInstance("MD5")
                     for (r <- p) {
                       val keyColValues = keyCols.map { x => r.getAs(x).toString() }.toList.mkString("|")
                       val valColValue = r.getAs(valCol).toString()
                       val scoreColValue = r.getAs[Long](scoreCol)
                       val redisKey = s"$keyColValues|$redisPreKey"
-                      val redisKeyMD5 = DigestUtils.md5Hex(redisKey)
+                      val redisKeyMD5 = Hex.encodeHexString(messageDigest.digest(redisKey.getBytes("UTF-8")))
                       val topNMap = keyTopNMap.getOrElseUpdate(redisKeyMD5, new java.util.TreeMap[Long, java.util.HashSet[String]](new java.util.Comparator[Long]() {
                         override def compare(o1: Long, o2: Long): Int = {
                           0 - o1.compareTo(o2)
@@ -1060,6 +1067,7 @@ object CustomSQLUtil extends Logging {
       allFuncOpMap.put(result._1, result._2)
     }
 
+    val messageDigest = MessageDigest.getInstance("MD5")
     for (r <- p) {
       val groupByKeyStr = groupByItems.map { x => r.getAs(x).toString() }.toList.mkString("|")
       val aggRowMap = aggResultMap.getOrElseUpdate(groupByKeyStr, scala.collection.mutable.Map[String, Any]())
@@ -1134,7 +1142,7 @@ object CustomSQLUtil extends Logging {
 
                         val keyColValues = keyCols.map { x => r.getAs(x).toString() }.toList.mkString("|")
                         val redisKey = s"$keyColValues|$redisPreKey"
-                        val redisKeyMD5 = DigestUtils.md5Hex(redisKey)
+                        val redisKeyMD5 = Hex.encodeHexString(messageDigest.digest(redisKey.getBytes("UTF-8")))
 
                         val bufferObj = curFuncOpMap.getOrElse(redisKeyMD5, null)
                         if (bufferObj != null) {
@@ -1152,7 +1160,7 @@ object CustomSQLUtil extends Logging {
                         val partitionColValue = r.getAs(partitionCol).toString()
                         val keyColValues = keyCols.map { x => r.getAs(x).toString() }.toList.mkString("|")
                         val pKeyColValues = s"$keyColValues|$partitionColValue"
-                        val pKeyColValuesMD5 = DigestUtils.md5Hex(pKeyColValues)
+                        val pKeyColValuesMD5 = Hex.encodeHexString(messageDigest.digest(pKeyColValues.getBytes("UTF-8")))
 
                         val bufferObj = curFuncOpMap.getOrElse(pKeyColValuesMD5, null)
                         if (bufferObj != null) {
@@ -1170,7 +1178,7 @@ object CustomSQLUtil extends Logging {
                         val partitionColValue = r.getAs(partitionCol).toString()
                         val keyColValues = keyCols.map { x => r.getAs(x).toString() }.toList.mkString("|")
                         val pKeyColValues = s"$keyColValues|$partitionColValue"
-                        val pKeyColValuesMD5 = DigestUtils.md5Hex(pKeyColValues)
+                        val pKeyColValuesMD5 = Hex.encodeHexString(messageDigest.digest(pKeyColValues.getBytes("UTF-8")))
 
                         val bufferObj = curFuncOpMap.getOrElse(pKeyColValuesMD5, null)
                         if (bufferObj != null) {
@@ -1188,7 +1196,7 @@ object CustomSQLUtil extends Logging {
                         val partitionColValue = r.getAs(partitionCol).toString()
                         val keyColValues = keyCols.map { x => r.getAs(x).toString() }.toList.mkString("|")
                         val pKeyColValues = s"$keyColValues|$partitionColValue"
-                        val pKeyColValuesMD5 = DigestUtils.md5Hex(pKeyColValues)
+                        val pKeyColValuesMD5 = Hex.encodeHexString(messageDigest.digest(pKeyColValues.getBytes("UTF-8")))
 
                         val bufferObj = curFuncOpMap.getOrElse(pKeyColValuesMD5, null)
                         if (bufferObj != null) {
@@ -1205,7 +1213,7 @@ object CustomSQLUtil extends Logging {
 
                         val keyColValues = keyCols.map { x => r.getAs(x).toString() }.toList.mkString("|")
                         val redisKey = s"$keyColValues|$redisPreKey"
-                        val redisKeyMD5 = DigestUtils.md5Hex(redisKey)
+                        val redisKeyMD5 = Hex.encodeHexString(messageDigest.digest(redisKey.getBytes("UTF-8")))
 
                         val bufferObj = curFuncOpMap.getOrElse(redisKeyMD5, null)
                         if (bufferObj != null) {
