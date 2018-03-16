@@ -165,8 +165,8 @@
 
 7、启动web
 	在192.168.1.10
-	java -Xms1024m -Xmx1024m -cp /data/src/meteor/jetty-server/target/meteor-jetty-server-1.0-SNAPSHOT-jar-with-dependencies.jar com.meteor.jetty.server.JettyServer "/data/src/meteor/mc/target/meteor-mc-1.0-SNAPSHOT.war" "/" "8070" > mc.log 2>&1 &
-	java -Xms1024m -Xmx1024m -DkafkaConnectHost=192.168.1.20:9092,192.168.1.21:9092,192.168.1.22:9092 -DredisHost=192.168.1.30 -DredisPort=6380 -cp /data/src/meteor/jetty-server/target/meteor-jetty-server-1.0-SNAPSHOT-jar-with-dependencies.jar com.meteor.jetty.server.JettyServer "/data/src/meteor/transfer/target/meteor-transfer-1.0-SNAPSHOT.war" "/" "8090" > transfer.log 2>&1 &
+	java -Xms1024m -Xmx1024m -cp /data/src/meteor/jetty-server/target/meteor-jetty-server-1.0-SNAPSHOT-jar-with-dependencies.jar com.duowan.meteor.jetty.server.JettyServer "/data/src/meteor/mc/target/meteor-mc-1.0-SNAPSHOT.war" "/" "8070" > mc.log 2>&1 &
+	java -Xms1024m -Xmx1024m -DkafkaConnectHost=192.168.1.20:9092,192.168.1.21:9092,192.168.1.22:9092 -DredisHost=192.168.1.30 -DredisPort=6380 -cp /data/src/meteor/jetty-server/target/meteor-jetty-server-1.0-SNAPSHOT-jar-with-dependencies.jar com.duowan.meteor.jetty.server.JettyServer "/data/src/meteor/transfer/target/meteor-transfer-1.0-SNAPSHOT.war" "/" "8090" > transfer.log 2>&1 &
 	通过http://192.168.1.10:8070/login.do登录web前台
 	
 8、安装spark（版本只能是2.1.0）
