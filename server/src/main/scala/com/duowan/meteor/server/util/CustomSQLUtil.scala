@@ -88,6 +88,9 @@ import net.sf.jsqlparser.statement.select.SelectItemVisitor
 import net.sf.jsqlparser.statement.select.SubSelect
 import java.security.MessageDigest
 import org.apache.commons.codec.binary.Hex
+import org.apache.spark.sql.types.StringType
+import org.apache.spark.sql.types.StructField
+import org.apache.spark.sql.types.StructType
 
 /**
  * Created by Administrator on 2015/8/19 0019.
@@ -169,7 +172,35 @@ object CustomSQLUtil extends Logging {
 
       ExecutorContext.spark.sql(s"CACHE TABLE $resultTableName")
     } else {
-      resultTableName = ""
+      //建空表，以免后续sql报错
+      val stmt = CCJSqlParserUtil.parse(new StringReader(sql))
+      val selectBody = stmt.asInstanceOf[Select].getSelectBody().asInstanceOf[PlainSelect]
+  		val selectItems = selectBody.getSelectItems().toList
+  		val fieldList = ListBuffer[StructField]()
+  		for (selectItem <- selectItems) {
+        selectItem.accept(new SelectItemVisitor() {
+        	override def visit(allColumns: AllColumns): Unit = {
+        	}
+        	
+        	override def visit(allTableColumns: AllTableColumns): Unit = {
+        	}
+        	
+        	override def visit(selectExpressionItem: SelectExpressionItem): Unit = {
+        	    var aliasName: String = null
+        	    var alias = selectExpressionItem.getAlias()
+        	    if (alias != null) {
+        	      aliasName = alias.toString()
+        	    } else {
+        	    	aliasName = selectExpressionItem.getExpression().toString()
+        	    }
+              fieldList += StructField(StringUtils.trim(aliasName), StringType)
+        	}
+        })
+  		}
+      val emptyRDD = spark.sparkContext.emptyRDD[Row]
+      var emptySchema = new StructType(fieldList.toArray)
+      val emptyDF = spark.createDataFrame(emptyRDD, emptySchema)
+      emptyDF.createOrReplaceTempView(resultTableName)
     }
     mapPartitionRDD.unpersist(false)
     resultTableName
